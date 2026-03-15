@@ -1,0 +1,297 @@
+/* ==========================================
+   SENT EMAILS HISTORY - sent_emails_history.css
+   ========================================== */
+
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --navy: #0f1e35;
+    --navy-light: #1e3a5f;
+    --gold: #c9a84c;
+    --red: #dc2626;
+    --red-bg: #fef2f2;
+    --green: #16a34a;
+    --green-bg: #f0fdf4;
+    --green-border: #bbf7d0;
+    --blue: #2563eb;
+    --blue-bg: #eff6ff;
+    --cream: #f7f6f3;
+    --white: #ffffff;
+    --text-dark: #111827;
+    --text-muted: #6b7280;
+    --border: #e5e7eb;
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body: 'DM Sans', sans-serif;
+    --transition: 0.25s ease;
+}
+
+body {
+    font-family: var(--font-body);
+    background: var(--cream);
+    color: var(--text-dark);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ---- Top Bar ---- */
+.top-bar {
+    background: var(--navy);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}
+
+.top-bar-inner {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 32px;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.brand { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+
+.brand-icon {
+    width: 40px; height: 40px;
+    border: 1.5px solid var(--gold);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(201,168,76,0.1);
+}
+
+.brand-icon i { color: var(--gold); font-size: 16px; }
+.brand-text { display: flex; flex-direction: column; }
+.brand-name { font-family: var(--font-display); font-size: 1.05rem; color: var(--white); line-height: 1.1; }
+.brand-sub { font-size: 0.7rem; color: rgba(255,255,255,0.45); font-weight: 300; letter-spacing: 0.06em; text-transform: uppercase; }
+
+.top-actions { display: flex; align-items: center; gap: 16px; }
+
+.admin-badge {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 0.78rem; font-weight: 500; color: var(--gold);
+    background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 20px; padding: 5px 14px; letter-spacing: 0.03em;
+}
+
+.btn-logout {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 0.82rem; font-weight: 500;
+    color: rgba(255,255,255,0.7); text-decoration: none;
+    padding: 7px 16px; border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px; transition: background var(--transition), color var(--transition);
+}
+
+.btn-logout:hover { background: rgba(255,255,255,0.08); color: var(--white); }
+
+/* ---- Main ---- */
+.main-content {
+    flex: 1;
+    max-width: 1300px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 40px 32px;
+}
+
+/* ---- Page Hero ---- */
+.page-hero {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.breadcrumb {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 0.8rem; color: var(--text-muted); text-decoration: none;
+    margin-bottom: 8px; transition: color var(--transition);
+}
+
+.breadcrumb:hover { color: var(--navy); }
+
+.hero-left h1 {
+    font-family: var(--font-display);
+    font-size: 2.2rem;
+    color: var(--navy);
+    margin-bottom: 4px;
+}
+
+.hero-left p { color: var(--text-muted); font-size: 0.9rem; font-weight: 300; }
+
+.record-count {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 0.82rem; font-weight: 500;
+    color: var(--text-muted);
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 16px;
+}
+
+.record-count i { color: var(--gold); }
+
+/* ---- Flash Messages ---- */
+.flash-messages {
+    margin-bottom: 24px;
+    display: flex; flex-direction: column; gap: 10px;
+}
+
+.alert {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px; border-radius: 8px; font-size: 0.875rem;
+}
+
+.alert-success { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+.alert-error { background: var(--red-bg); color: var(--red); border: 1px solid #fecaca; }
+
+/* ---- Table ---- */
+.table-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+}
+
+.table-scroll { overflow-x: auto; }
+
+table { width: 100%; border-collapse: collapse; }
+
+thead tr { background: var(--navy); }
+
+th {
+    padding: 13px 16px;
+    text-align: left;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.65);
+    white-space: nowrap;
+}
+
+td {
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.875rem;
+    color: var(--text-dark);
+    vertical-align: middle;
+}
+
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: #f9f9ff; }
+
+.row-num { color: var(--text-muted); font-size: 0.8rem; }
+
+.student-name {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 500; white-space: nowrap;
+}
+
+.avatar {
+    width: 32px; height: 32px;
+    background: var(--navy); color: var(--gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.72rem; font-weight: 700; flex-shrink: 0;
+}
+
+.reg-badge {
+    background: var(--blue-bg); color: var(--blue);
+    padding: 3px 10px; border-radius: 20px;
+    font-size: 0.78rem; font-weight: 600; letter-spacing: 0.04em;
+}
+
+.vehicle-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: #f3f4f6; color: var(--text-dark);
+    padding: 3px 10px; border-radius: 20px;
+    font-size: 0.78rem; font-weight: 500;
+}
+
+.vehicle-badge i { font-size: 9px; color: var(--text-muted); }
+
+.email-cell { max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.date-cell {
+    white-space: nowrap; font-size: 0.82rem; color: var(--text-muted);
+    display: flex; align-items: center; gap: 6px;
+}
+
+.date-cell i { font-size: 10px; color: var(--gold); }
+
+.status-sent {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--green-bg); color: var(--green);
+    border: 1px solid var(--green-border);
+    padding: 3px 10px; border-radius: 20px;
+    font-size: 0.75rem; font-weight: 600;
+}
+
+/* ---- Empty State ---- */
+.empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+}
+
+.empty-icon {
+    width: 72px; height: 72px;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 26px; color: var(--text-muted);
+}
+
+.empty-state h3 { font-size: 1.1rem; color: var(--text-dark); margin-bottom: 6px; }
+.empty-state p { color: var(--text-muted); font-size: 0.875rem; margin-bottom: 24px; }
+
+.btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 20px; border-radius: 8px;
+    font-family: var(--font-body); font-size: 0.85rem; font-weight: 600;
+    text-decoration: none; cursor: pointer;
+    transition: transform var(--transition), box-shadow var(--transition);
+    border: none;
+}
+
+.btn-primary {
+    background: var(--navy);
+    color: var(--white);
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(15,30,53,0.25);
+}
+
+/* ---- Footer ---- */
+.site-footer {
+    background: var(--navy);
+    color: rgba(255,255,255,0.35);
+    text-align: center;
+    font-size: 0.75rem;
+    padding: 20px;
+    letter-spacing: 0.03em;
+    margin-top: auto;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 640px) {
+    .top-bar-inner { padding: 0 16px; }
+    .main-content { padding: 24px 16px; }
+    .admin-badge { display: none; }
+    .hero-left h1 { font-size: 1.65rem; }
+}

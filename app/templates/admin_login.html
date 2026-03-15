@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login — Campus Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_login.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- LEFT PANEL -->
+    <div class="hero-panel">
+        <div class="hero-bg">
+            <div class="grid-overlay"></div>
+            <div class="orb orb-1"></div>
+            <div class="orb orb-2"></div>
+            <div class="orb orb-3"></div>
+        </div>
+
+        <div class="hero-content">
+            <div class="crest">
+                <div class="crest-ring crest-ring-outer"></div>
+                <div class="crest-ring crest-ring-inner"></div>
+                <div class="crest-icon">
+                    <i class="fas fa-university"></i>
+                </div>
+                <div class="crest-corner crest-corner-tl"></div>
+                <div class="crest-corner crest-corner-tr"></div>
+                <div class="crest-corner crest-corner-bl"></div>
+                <div class="crest-corner crest-corner-br"></div>
+            </div>
+
+            <div class="hero-text">
+                <span class="hero-eyebrow">Helmet Compliance System</span>
+                <h1 class="hero-title">Campus<br>Portal</h1>
+                <div class="hero-rule"></div>
+                <p class="hero-desc">Empowering campus safety through intelligent vehicle compliance monitoring and automated enforcement.</p>
+            </div>
+
+            <div class="hero-stats">
+                <div class="stat">
+                    <span class="stat-val">24/7</span>
+                    <span class="stat-name">Monitoring</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat">
+                    <span class="stat-val">Auto</span>
+                    <span class="stat-name">Notifications</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat">
+                    <span class="stat-val">Live</span>
+                    <span class="stat-name">Analytics</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-footer">
+            <span>© 2024 Campus Portal</span>
+            <span class="dot"></span>
+            <span>All Rights Reserved</span>
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="form-panel">
+        <div class="form-panel-inner">
+
+            <div class="form-top">
+                <div class="form-badge">
+                    <i class="fas fa-shield-halved"></i>
+                    <span>Secure Access</span>
+                </div>
+            </div>
+
+            <div class="form-heading">
+                <h2>Welcome back</h2>
+                <p>Sign in to your administrator account to continue</p>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            <i class="fas fa-{{ 'check-circle' if category == 'success' else 'triangle-exclamation' }}"></i>
+                            <span>{{ message }}</span>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" class="login-form" novalidate>
+                <div class="field-group">
+                    <label for="username">Username</label>
+                    <div class="field-wrap">
+                        <span class="field-icon"><i class="fas fa-user-tie"></i></span>
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            placeholder="Enter your username"
+                            required
+                            autocomplete="username"
+                        >
+                        <span class="field-focus-bar"></span>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label for="password">Password</label>
+                    <div class="field-wrap">
+                        <span class="field-icon"><i class="fas fa-lock"></i></span>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Enter your password"
+                            required
+                            autocomplete="current-password"
+                        >
+                        <button type="button" class="pw-toggle" onclick="togglePw()" aria-label="Toggle password visibility">
+                            <i class="fas fa-eye" id="pwIcon"></i>
+                        </button>
+                        <span class="field-focus-bar"></span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-signin">
+                    <span class="btn-label">Sign In</span>
+                    <span class="btn-icon"><i class="fas fa-arrow-right"></i></span>
+                    <span class="btn-shine"></span>
+                </button>
+            </form>
+
+            <div class="form-divider">
+                <span></span><small>Administrator Access Only</small><span></span>
+            </div>
+
+            <div class="access-note">
+                <i class="fas fa-circle-info"></i>
+                <p>This portal is restricted to authorised college administrators. Unauthorised access attempts are logged and monitored.</p>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function togglePw() {
+            const input = document.getElementById('password');
+            const icon = document.getElementById('pwIcon');
+            const isHidden = input.type === 'password';
+            input.type = isHidden ? 'text' : 'password';
+            icon.className = isHidden ? 'fas fa-eye-slash' : 'fas fa-eye';
+        }
+    </script>
+</body>
+</html>

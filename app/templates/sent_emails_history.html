@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email History — Campus Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='sent_emails_history.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <header class="top-bar">
+        <div class="top-bar-inner">
+            <div class="brand">
+                <div class="brand-icon"><i class="fas fa-university"></i></div>
+                <div class="brand-text">
+                    <span class="brand-name">Campus Portal</span>
+                    <span class="brand-sub">Helmet Compliance System</span>
+                </div>
+            </div>
+            <div class="top-actions">
+                <span class="admin-badge"><i class="fas fa-user-shield"></i> Administrator</span>
+                <a href="{{ url_for('admin_login') }}" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="page-hero">
+            <div class="hero-left">
+                <a href="{{ url_for('defaulters') }}" class="breadcrumb">
+                    <i class="fas fa-chevron-left"></i> Defaulters
+                </a>
+                <h1>Email History</h1>
+                <p>Full log of all violation notices sent to defaulters</p>
+            </div>
+            {% if sent_emails %}
+            <div class="record-count">
+                <i class="fas fa-envelope-open-text"></i>
+                {{ sent_emails|length }} email{{ 's' if sent_emails|length > 1 else '' }} sent
+            </div>
+            {% endif %}
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            <i class="fas fa-{{ 'check-circle' if category == 'success' else 'times-circle' }}"></i>
+                            <span>{{ message }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% if sent_emails %}
+        <div class="table-card">
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>S.No</th>
+                            <th>Name</th>
+                            <th>Register No.</th>
+                            <th>Department</th>
+                            <th>Vehicle No.</th>
+                            <th>Email</th>
+                            <th>Violation Date</th>
+                            <th>Notice Sent</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for email in sent_emails %}
+                        <tr>
+                            <td class="row-num">{{ loop.index }}</td>
+                            <td class="student-name">
+                                <div class="avatar">{{ email['Name'][0]|upper }}</div>
+                                {{ email['Name'] }}
+                            </td>
+                            <td><span class="reg-badge">{{ email['RegisterNum'] }}</span></td>
+                            <td>{{ email['Department'] }}</td>
+                            <td><span class="vehicle-badge"><i class="fas fa-motorcycle"></i> {{ email['Bikeno'] }}</span></td>
+                            <td class="email-cell">{{ email['Email'] }}</td>
+                            <td class="date-cell"><i class="fas fa-calendar-alt"></i> {{ email['ViolationDateTime'] }}</td>
+                            <td class="date-cell"><i class="fas fa-paper-plane"></i> {{ email['SentDateTime'] }}</td>
+                            <td><span class="status-sent"><i class="fas fa-check"></i> {{ email['Status'] }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-inbox"></i>
+            </div>
+            <h3>No Emails Sent Yet</h3>
+            <p>Violation notices will appear here once they have been sent to defaulters.</p>
+            <a href="{{ url_for('defaulters') }}" class="btn btn-primary">
+                <i class="fas fa-arrow-left"></i> Go to Defaulters
+            </a>
+        </div>
+        {% endif %}
+    </main>
+
+    <footer class="site-footer">
+        <p>© 2024 Campus Portal — Helmet Compliance Management System. All rights reserved.</p>
+    </footer>
+</body>
+</html>

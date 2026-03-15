@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration — Campus Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='student_registration.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <header class="top-bar">
+        <div class="top-bar-inner">
+            <div class="brand">
+                <div class="brand-icon">
+                    <i class="fas fa-university"></i>
+                </div>
+                <div class="brand-text">
+                    <span class="brand-name">Campus Portal</span>
+                    <span class="brand-sub">Helmet Compliance System</span>
+                </div>
+            </div>
+            <nav class="top-nav">
+                <a href="{{ url_for('home') }}" class="nav-link active">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <a href="{{ url_for('admin_login') }}" class="nav-link">
+                    <i class="fas fa-user-shield"></i> Admin Login
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="page-layout">
+            <!-- Info Panel -->
+            <aside class="info-panel">
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="fas fa-helmet-safety"></i>
+                    </div>
+                    <h3>Why Register?</h3>
+                    <p>Registering your vehicle helps enforce campus helmet safety policies and ensures proper documentation for compliance monitoring.</p>
+                </div>
+                <div class="info-steps">
+                    <h4>Steps to Register</h4>
+                    <ul>
+                        <li>
+                            <span class="step-num">1</span>
+                            <span>Fill in your personal details</span>
+                        </li>
+                        <li>
+                            <span class="step-num">2</span>
+                            <span>Enter your vehicle registration number</span>
+                        </li>
+                        <li>
+                            <span class="step-num">3</span>
+                            <span>Provide a valid college email address</span>
+                        </li>
+                        <li>
+                            <span class="step-num">4</span>
+                            <span>Submit and receive confirmation</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="info-note">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Violation notices will be sent to your registered email address.</span>
+                </div>
+            </aside>
+
+            <!-- Form Card -->
+            <div class="form-card">
+                <div class="form-header">
+                    <h1>Student Registration</h1>
+                    <p>Register your vehicle for campus entry compliance</p>
+                </div>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="flash-messages">
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}">
+                                    <i class="fas fa-{{ 'check-circle' if category == 'success' else 'times-circle' }}"></i>
+                                    <span>{{ message }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST" onsubmit="return validateForm()">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">Full Name</label>
+                            <div class="input-wrap">
+                                <i class="fas fa-user"></i>
+                                <input type="text" name="name" id="name" placeholder="e.g. Arjun Kumar" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="register_number">Register Number</label>
+                            <div class="input-wrap">
+                                <i class="fas fa-id-card"></i>
+                                <input type="text" name="register_number" id="register_number" placeholder="e.g. 22CS001" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="department">Department</label>
+                            <div class="input-wrap">
+                                <i class="fas fa-building"></i>
+                                <input type="text" name="department" id="department" placeholder="e.g. Computer Science" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicle_number">Vehicle Number</label>
+                            <div class="input-wrap">
+                                <i class="fas fa-motorcycle"></i>
+                                <input type="text" name="vehicle_number" id="vehicle_number" placeholder="e.g. TN01AB1234" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="mobile_number">Mobile Number</label>
+                            <div class="input-wrap">
+                                <i class="fas fa-phone"></i>
+                                <input type="text" name="mobile_number" id="mobile_number" placeholder="10-digit number" required pattern="[0-9]{10}" title="Enter a valid 10-digit mobile number">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <div class="input-wrap">
+                                <i class="fas fa-envelope"></i>
+                                <input type="email" name="email" id="email" placeholder="college email address" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Complete Registration</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>© 2024 Campus Portal — Helmet Compliance Management System. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function validateForm() {
+            const mobile = document.getElementById('mobile_number').value.trim();
+            if (!/^\d{10}$/.test(mobile)) {
+                alert('Please enter a valid 10-digit mobile number.');
+                return false;
+            }
+            return true;
+        }
+        setTimeout(() => {
+            document.querySelectorAll('.alert').forEach(el => el.remove());
+        }, 5000);
+    </script>
+</body>
+</html>

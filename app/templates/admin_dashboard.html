@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard — Campus Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_dashboard.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <header class="top-bar">
+        <div class="top-bar-inner">
+            <div class="brand">
+                <div class="brand-icon">
+                    <i class="fas fa-university"></i>
+                </div>
+                <div class="brand-text">
+                    <span class="brand-name">Campus Portal</span>
+                    <span class="brand-sub">Helmet Compliance System</span>
+                </div>
+            </div>
+            <div class="top-actions">
+                <span class="admin-badge"><i class="fas fa-user-shield"></i> Administrator</span>
+                <a href="{{ url_for('admin_login') }}" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="page-hero">
+            <div class="hero-text">
+                <h1>Admin Dashboard</h1>
+                <p>Manage students and helmet compliance enforcement</p>
+            </div>
+            <div class="hero-date">
+                <i class="fas fa-calendar-alt"></i>
+                <span id="currentDate"></span>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            <i class="fas fa-{{ 'check-circle' if category == 'success' else 'info-circle' if category == 'info' else 'exclamation-triangle' if category == 'warning' else 'times-circle' }}"></i>
+                            <span>{{ message }}</span>
+                            <button class="alert-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="dashboard-grid">
+            <a href="{{ url_for('student_details') }}" class="dash-card">
+                <div class="card-icon-wrap icon-blue">
+                    <i class="fas fa-id-card"></i>
+                </div>
+                <div class="card-body">
+                    <h3>View All Students</h3>
+                    <p>Browse, search and manage all registered student records and vehicle details.</p>
+                </div>
+                <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
+            </a>
+
+            <a href="http://127.0.0.1:5001/register" class="dash-card">
+                <div class="info-icon">
+                    <i class="fas fa-helmet-safety"></i>
+                </div>
+                <div class="card-body">
+                    <h3>Register New Students</h3>
+                    <p>Registering your vehicle helps enforce campus helmet safety policies and ensures proper documentation for compliance monitoring.</p>
+                </div>
+                <div class="card-arrow"><i class="fas fa-external-link-alt"></i></div>
+            </a>
+
+            
+
+            <a href="{{ url_for('defaulters') }}" class="dash-card">
+                <div class="card-icon-wrap icon-red">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="card-body">
+                    <h3>Helmet Defaulters</h3>
+                    <p>View pending and processed helmet violation cases. Send notice emails to defaulters.</p>
+                </div>
+                <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
+            </a>
+
+            <a href="http://localhost:8501/" class="dash-card" target="_blank">
+                <div class="card-icon-wrap icon-green">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="card-body">
+                    <h3>Defaulters Analyser</h3>
+                    <p>Explore interactive charts and insights on helmet violation trends and patterns.</p>
+                </div>
+                <div class="card-arrow"><i class="fas fa-external-link-alt"></i></div>
+            </a>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>© 2024 Campus Portal — Helmet Compliance Management System. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const d = new Date();
+        document.getElementById('currentDate').textContent = d.toLocaleDateString('en-IN', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+
+        setTimeout(() => {
+            document.querySelectorAll('.alert').forEach(el => el.remove());
+        }, 5000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Details — Campus Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='student_details.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <header class="top-bar">
+        <div class="top-bar-inner">
+            <div class="brand">
+                <div class="brand-icon"><i class="fas fa-university"></i></div>
+                <div class="brand-text">
+                    <span class="brand-name">Campus Portal</span>
+                    <span class="brand-sub">Helmet Compliance System</span>
+                </div>
+            </div>
+            <div class="top-actions">
+                <span class="admin-badge"><i class="fas fa-user-shield"></i> Administrator</span>
+                <a href="{{ url_for('admin_login') }}" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="page-hero">
+            <div class="hero-left">
+                <a href="{{ url_for('admin_dashboard') }}" class="breadcrumb">
+                    <i class="fas fa-chevron-left"></i> Dashboard
+                </a>
+                <h1>Student Records</h1>
+                <p>View, search and manage all registered students</p>
+            </div>
+            <!-- <a href="{{ url_for('download_students') }}" class="btn btn-download">
+                <i class="fas fa-download"></i> Export CSV
+            </a> -->
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            <i class="fas fa-{{ 'check-circle' if category == 'success' else 'times-circle' }}"></i>
+                            <span>{{ message }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% if students %}
+        <!-- Summary Cards -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+                <div>
+                    <div class="stat-value">{{ students|length }}</div>
+                    <div class="stat-label">Total Students</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon purple"><i class="fas fa-building"></i></div>
+                <div>
+                    <div class="stat-value">{{ departments|length }}</div>
+                    <div class="stat-label">Departments</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green"><i class="fas fa-motorcycle"></i></div>
+                <div>
+                    <div class="stat-value">{{ students|selectattr('Bikeno', 'ne', '')|list|length }}</div>
+                    <div class="stat-label">Registered Vehicles</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search & Filter -->
+        <div class="filter-bar">
+            <div class="search-wrap">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search by name, register number, department..." onkeyup="searchTable()">
+            </div>
+            <div class="select-wrap">
+                <i class="fas fa-filter"></i>
+                <select id="departmentFilter" onchange="filterByDepartment()">
+                    <option value="">All Departments</option>
+                    {% for dept in departments %}
+                    <option value="{{ dept }}">{{ dept }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-card">
+            <div class="table-scroll">
+                <table id="studentsTable">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(0)">S.No <i class="fas fa-sort sort-icon"></i></th>
+                            <th onclick="sortTable(1)">Name <i class="fas fa-sort sort-icon"></i></th>
+                            <th onclick="sortTable(2)">Register No. <i class="fas fa-sort sort-icon"></i></th>
+                            <th onclick="sortTable(3)">Department <i class="fas fa-sort sort-icon"></i></th>
+                            <th onclick="sortTable(4)">Vehicle No. <i class="fas fa-sort sort-icon"></i></th>
+                            <th>Mobile</th>
+                            <th>Email</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                        <tr>
+                            <td class="row-num">{{ loop.index }}</td>
+                            <td class="student-name">
+                                <div class="avatar">{{ student['Name'][0]|upper }}</div>
+                                {{ student['Name'] }}
+                            </td>
+                            <td><span class="reg-badge">{{ student['Register Number'] }}</span></td>
+                            <td>{{ student['Department'] }}</td>
+                            <td><span class="vehicle-badge"><i class="fas fa-motorcycle"></i> {{ student['Bikeno'] }}</span></td>
+                            <td>{{ student['MobileNum'] }}</td>
+                            <td class="email-cell">{{ student['Email'] }}</td>
+                            <td class="actions">
+                                <button class="action-btn view" onclick="viewStudent('{{ student['Register Number'] }}')" title="View details">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="action-btn edit" onclick="editStudent('{{ student['Register Number'] }}')" title="Edit">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </button>
+                                <button class="action-btn delete" onclick="deleteStudent('{{ student['Register Number'] }}', '{{ student['Name'] }}')" title="Delete">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon"><i class="fas fa-user-graduate"></i></div>
+            <h3>No Students Registered</h3>
+            <p>No student records found in the system.</p>
+        </div>
+        {% endif %}
+    </main>
+
+    <!-- View Modal -->
+    <div id="viewModal" class="modal-overlay" onclick="handleOverlayClick(event, 'viewModal')">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2><i class="fas fa-id-card"></i> Student Profile</h2>
+                <button class="modal-close" onclick="closeModal('viewModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div id="studentDetails"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal-overlay" onclick="handleOverlayClick(event, 'editModal')">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2><i class="fas fa-pencil-alt"></i> Edit Student</h2>
+                <button class="modal-close" onclick="closeModal('editModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm" method="POST" action="{{ url_for('update_student') }}">
+                    <input type="hidden" id="edit_reg_no" name="register_number">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit_name">Full Name</label>
+                            <div class="input-wrap">
+                                <i class="fas fa-user"></i>
+                                <input type="text" id="edit_name" name="name" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_department">Department</label>
+                            <div class="input-wrap">
+                                <i class="fas fa-building"></i>
+                                <input type="text" id="edit_department" name="department" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit_vehicle">Vehicle Number</label>
+                            <div class="input-wrap">
+                                <i class="fas fa-motorcycle"></i>
+                                <input type="text" id="edit_vehicle" name="vehicle_number" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_mobile">Mobile Number</label>
+                            <div class="input-wrap">
+                                <i class="fas fa-phone"></i>
+                                <input type="text" id="edit_mobile" name="mobile_number" required pattern="[0-9]{10}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_email">Email Address</label>
+                        <div class="input-wrap">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="edit_email" name="email" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-save">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <p>© 2024 Campus Portal — Helmet Compliance Management System. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function searchTable() {
+            let filter = document.getElementById("searchInput").value.toUpperCase();
+            let rows = document.querySelectorAll("#studentsTable tbody tr");
+            rows.forEach(row => {
+                let cells = row.querySelectorAll("td");
+                let found = Array.from(cells).some((td, i) => i < cells.length - 1 && td.textContent.toUpperCase().includes(filter));
+                row.style.display = found ? "" : "none";
+            });
+        }
+
+        function filterByDepartment() {
+            let filter = document.getElementById("departmentFilter").value.toUpperCase();
+            let rows = document.querySelectorAll("#studentsTable tbody tr");
+            rows.forEach(row => {
+                let dept = row.querySelectorAll("td")[3];
+                row.style.display = (!filter || dept.textContent.toUpperCase().trim() === filter) ? "" : "none";
+            });
+        }
+
+        function sortTable(n) {
+            let table = document.getElementById("studentsTable");
+            let switching = true, direction = "asc", switchcount = 0;
+            while (switching) {
+                switching = false;
+                let rows = table.rows;
+                for (let i = 1; i < rows.length - 1; i++) {
+                    let x = rows[i].getElementsByTagName("TD")[n];
+                    let y = rows[i+1].getElementsByTagName("TD")[n];
+                    let shouldSwitch = direction === "asc"
+                        ? x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()
+                        : x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase();
+                    if (shouldSwitch) {
+                        rows[i].parentNode.insertBefore(rows[i+1], rows[i]);
+                        switching = true; switchcount++;
+                    }
+                }
+                if (!switching && switchcount === 0 && direction === "asc") {
+                    direction = "desc"; switching = true;
+                }
+            }
+        }
+
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        function handleOverlayClick(e, id) { if (e.target.id === id) closeModal(id); }
+
+        function viewStudent(regNo) {
+            fetch(`/get_student/${regNo}`)
+                .then(r => r.json())
+                .then(d => {
+                    document.getElementById('studentDetails').innerHTML = `
+                        <div class="profile-grid">
+                            <div class="profile-avatar">${d.Name[0].toUpperCase()}</div>
+                            <div class="profile-info">
+                                <h3>${d.Name}</h3>
+                                <span class="dept-tag">${d.Department}</span>
+                            </div>
+                        </div>
+                        <div class="detail-rows">
+                            <div class="detail-row"><span class="detail-label"><i class="fas fa-id-card"></i> Register No.</span><span>${d['Register Number']}</span></div>
+                            <div class="detail-row"><span class="detail-label"><i class="fas fa-motorcycle"></i> Vehicle</span><span>${d.Bikeno}</span></div>
+                            <div class="detail-row"><span class="detail-label"><i class="fas fa-phone"></i> Mobile</span><span>${d.MobileNum}</span></div>
+                            <div class="detail-row"><span class="detail-label"><i class="fas fa-envelope"></i> Email</span><span>${d.Email}</span></div>
+                        </div>`;
+                    openModal('viewModal');
+                });
+        }
+
+        function editStudent(regNo) {
+            fetch(`/get_student/${regNo}`)
+                .then(r => r.json())
+                .then(d => {
+                    document.getElementById('edit_reg_no').value = d['Register Number'];
+                    document.getElementById('edit_name').value = d.Name;
+                    document.getElementById('edit_department').value = d.Department;
+                    document.getElementById('edit_vehicle').value = d.Bikeno;
+                    document.getElementById('edit_mobile').value = d.MobileNum;
+                    document.getElementById('edit_email').value = d.Email;
+                    openModal('editModal');
+                });
+        }
+
+        function deleteStudent(regNo, name) {
+            if (confirm(`Are you sure you want to delete ${name}? This action cannot be undone.`)) {
+                fetch(`/delete_student/${regNo}`, { method: 'POST' })
+                    .then(r => { if (r.ok) location.reload(); else alert('Error deleting student.'); });
+            }
+        }
+    </script>
+</body>
+</html>
