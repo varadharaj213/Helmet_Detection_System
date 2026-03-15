@@ -1,0 +1,48 @@
+#1 
+Install Xampp and connect db
+
+import student.sql in the Xampp
+
+
+#2
+add groq api key and cred.json email file 
+
+To create a Mail api for your mail use this url to get credential and make that credentials as cred.json and keep it in 
+inside of core folder
+
+https://console.cloud.google.com/welcome?project=protean-keyword-452810-n8
+
+
+
+#3
+
+c:\Program Files\Tesseract-OCR\tesseract.exe
+
+this file need to be in c drive
+
+#3
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+pip install -r final.txt
+
+
+
+#4 if any error comes
+pip install --upgrade typing_extensions
+pip install --upgrade pydantic pydantic-core
+pip install --upgrade langchain langchain-community
+
+
+#5 normal run
+python app\app.py
+
+
+#6
+
+streamlit run main_app.py
+
+
+#7
+
+path change where this D:\Helemtworkingproject\Helmet-Detection-System is there
