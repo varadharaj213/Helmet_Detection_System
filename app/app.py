@@ -11,6 +11,9 @@ from langchain_community.tools.gmail.utils import (
     get_gmail_credentials,
 )
 from datetime import datetime
+import base64
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 app = Flask(__name__)
 app.secret_key = 'Your_API_KEY'  # Required for flash messages
@@ -490,43 +493,156 @@ def send_violation_mails(defaulters_filename=os.path.join(BASE_DIR, 'matched_stu
         # Send emails to new defaulters
         for defaulter in new_defaulters:
             try:
-                violation_query = f'''
-                Send an email to {defaulter['email_id']} with the following details:
-                
-                Subject: Helmet Rule Violation Notice - {defaulter['violation_datetime']}
-                
-                Dear {defaulter['name']},
-                
-                This is to inform you that you have been identified as not wearing a helmet on {defaulter['violation_datetime']}.
-                
-                Student Details:
-                - Register Number: {defaulter['reg_no']}
-                - Department: {defaulter['department']}
-                - Vehicle Number: {defaulter['vehicle_no']}
-                
-                Please note that wearing a helmet is mandatory as per college safety regulations. This is a warning notice. 
-                Repeat offenses may lead to stricter disciplinary action.
-                
-                We request you to comply with the safety rules for your own protection.
-                
-                Regards,
-                College Safety Department
-                
-                Directly send this email without asking for review or confirmation.
-                '''
-                
+                # --- Build professional HTML email body ---
+                ref_id = f"HSV/{defaulter['reg_no']}/{defaulter['violation_datetime'][:10].replace('-', '')}"
+                html_body = f"""<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/></head>
+<body style="margin:0;padding:0;background-color:#f0f2f5;font-family:'Segoe UI',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f0f2f5;padding:30px 0;">
+  <tr><td align="center">
+    <table width="620" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:10px;overflow:hidden;">
+
+      <!-- HEADER -->
+      <tr><td style="background:#1a237e;padding:22px 28px 0 28px;">
+        <table width="100%" cellpadding="0" cellspacing="0"><tr>
+          <td width="52" valign="middle">
+            <div style="width:48px;height:48px;background:#ffffff;border-radius:50%;text-align:center;line-height:48px;">
+              <img src="https://img.icons8.com/ios-filled/50/1a237e/graduation-cap.png" width="28" height="28" style="margin-top:10px;" alt="Logo"/>
+            </div>
+          </td>
+          <td style="padding-left:12px;" valign="middle">
+            <div style="color:#ffffff;font-size:18px;font-weight:700;">YOUR COLLEGE NAME</div>
+            <div style="color:#90caf9;font-size:11px;margin-top:2px;">Office of Campus Safety &amp; Compliance</div>
+          </td>
+          <td align="right" valign="middle">
+            <div style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.4);border-radius:5px;padding:4px 12px;">
+              <span style="color:#ffffff;font-size:10px;font-weight:700;letter-spacing:1px;">OFFICIAL NOTICE</span>
+            </div>
+          </td>
+        </tr></table>
+        <div style="background:#c62828;margin:14px -28px 0 -28px;padding:9px 28px;">
+          <table width="100%" cellpadding="0" cellspacing="0"><tr>
+            <td><span style="color:#ffffff;font-size:12px;font-weight:700;">HELMET SAFETY VIOLATION - FORMAL WARNING NOTICE</span></td>
+            <td align="right"><span style="color:#ffcdd2;font-size:10px;">Ref: {ref_id}</span></td>
+          </tr></table>
+        </div>
+      </td></tr>
+
+      <!-- GREETING -->
+      <tr><td style="padding:22px 28px 0 28px;">
+        <p style="margin:0 0 5px;font-size:14px;color:#1a237e;font-weight:700;">Dear {defaulter['name']},</p>
+        <p style="margin:0 0 18px;font-size:13px;color:#37474f;line-height:1.7;">
+          Greetings from the <strong>Office of Campus Safety &amp; Compliance</strong>.<br/>
+          This is a formal notice that a violation of the mandatory helmet safety regulation has been recorded against your name during routine campus surveillance on <strong style="color:#c62828;">{defaulter['violation_datetime']}</strong>.
+        </p>
+      </td></tr>
+
+      <!-- VIOLATION DETAILS TABLE -->
+      <tr><td style="padding:0 28px 18px;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-radius:8px;overflow:hidden;border:1px solid #e3e8f0;">
+          <tr><td colspan="2" style="background:#1a237e;padding:9px 16px;">
+            <span style="color:#ffffff;font-size:11px;font-weight:700;letter-spacing:1px;">VIOLATION DETAILS</span>
+          </td></tr>
+          <tr style="background:#f5f7ff;"><td style="padding:9px 16px;font-size:12px;color:#546e7a;font-weight:600;width:42%;border-bottom:1px solid #e8ecf5;">Student Name</td><td style="padding:9px 16px;font-size:12px;color:#1a237e;font-weight:700;border-bottom:1px solid #e8ecf5;">{defaulter['name']}</td></tr>
+          <tr><td style="padding:9px 16px;font-size:12px;color:#546e7a;font-weight:600;border-bottom:1px solid #e8ecf5;">Register Number</td><td style="padding:9px 16px;font-size:12px;color:#1a237e;font-weight:700;border-bottom:1px solid #e8ecf5;">{defaulter['reg_no']}</td></tr>
+          <tr style="background:#f5f7ff;"><td style="padding:9px 16px;font-size:12px;color:#546e7a;font-weight:600;border-bottom:1px solid #e8ecf5;">Department</td><td style="padding:9px 16px;font-size:12px;color:#1a237e;font-weight:700;border-bottom:1px solid #e8ecf5;">{defaulter['department']}</td></tr>
+          <tr><td style="padding:9px 16px;font-size:12px;color:#546e7a;font-weight:600;border-bottom:1px solid #e8ecf5;">Vehicle Number</td><td style="padding:9px 16px;font-size:12px;color:#1a237e;font-weight:700;border-bottom:1px solid #e8ecf5;">{defaulter['vehicle_no']}</td></tr>
+          <tr style="background:#f5f7ff;"><td style="padding:9px 16px;font-size:12px;color:#546e7a;font-weight:600;border-bottom:1px solid #e8ecf5;">Date &amp; Time</td><td style="padding:9px 16px;font-size:12px;color:#c62828;font-weight:700;border-bottom:1px solid #e8ecf5;">{defaulter['violation_datetime']}</td></tr>
+          <tr><td style="padding:9px 16px;font-size:12px;color:#546e7a;font-weight:600;border-bottom:1px solid #e8ecf5;">Violation Type</td><td style="padding:9px 16px;font-size:12px;color:#c62828;font-weight:700;border-bottom:1px solid #e8ecf5;">Riding without a helmet within campus premises</td></tr>
+          <tr style="background:#fff8e1;"><td style="padding:9px 16px;font-size:12px;color:#546e7a;font-weight:600;">Notice Type</td>
+          <td style="padding:9px 16px;"><span style="background:#c62828;color:#ffffff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px;">FIRST &amp; FORMAL WARNING</span></td></tr>
+        </table>
+      </td></tr>
+
+      <!-- POLICY NOTE -->
+      <tr><td style="padding:0 28px 18px;">
+        <div style="background:#e8eaf6;border-left:4px solid #1a237e;padding:12px 14px;">
+          <p style="margin:0 0 3px;font-size:11px;font-weight:700;color:#1a237e;">CAMPUS SAFETY POLICY - SECTION 4.2</p>
+          <p style="margin:0;font-size:12px;color:#37474f;line-height:1.6;">All students operating or riding a two-wheeler within college premises must wear a certified helmet at all times. Non-compliance is a violation of institutional safety rules.</p>
+        </div>
+      </td></tr>
+
+      <!-- ACTION REQUIRED -->
+      <tr><td style="padding:0 28px 18px;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-radius:8px;overflow:hidden;border:1px solid #e3e8f0;">
+          <tr><td style="background:#283593;padding:9px 16px;"><span style="color:#ffffff;font-size:11px;font-weight:700;letter-spacing:1px;">ACTION REQUIRED</span></td></tr>
+          <tr><td style="padding:14px 16px;">
+            <table cellpadding="0" cellspacing="0" width="100%">
+              <tr>
+                <td width="26" valign="top"><div style="background:#1a237e;color:#fff;font-size:10px;font-weight:700;width:20px;height:20px;border-radius:50%;text-align:center;line-height:20px;">1</div></td>
+                <td style="font-size:12px;color:#37474f;padding-bottom:9px;line-height:1.6;padding-left:8px;">Ensure <strong>strict compliance</strong> with the helmet regulation effective immediately.</td>
+              </tr>
+              <tr>
+                <td width="26" valign="top"><div style="background:#1a237e;color:#fff;font-size:10px;font-weight:700;width:20px;height:20px;border-radius:50%;text-align:center;line-height:20px;">2</div></td>
+                <td style="font-size:12px;color:#37474f;padding-bottom:9px;line-height:1.6;padding-left:8px;">Report to the <strong>Campus Safety Office (Room No. 101, Admin Block)</strong> within <strong>3 working days</strong> to acknowledge this violation.</td>
+              </tr>
+              <tr>
+                <td width="26" valign="top"><div style="background:#1a237e;color:#fff;font-size:10px;font-weight:700;width:20px;height:20px;border-radius:50%;text-align:center;line-height:20px;">3</div></td>
+                <td style="font-size:12px;color:#37474f;line-height:1.6;padding-left:8px;">Carry a copy of this notice during your visit to the Safety Office.</td>
+              </tr>
+            </table>
+          </td></tr>
+        </table>
+      </td></tr>
+
+      <!-- CONSEQUENCES -->
+      <tr><td style="padding:0 28px 18px;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background:#fff3e0;border-radius:8px;border:1px solid #ffcc80;">
+          <tr><td style="background:#e65100;padding:9px 16px;border-radius:7px 7px 0 0;">
+            <span style="color:#ffffff;font-size:11px;font-weight:700;letter-spacing:1px;">CONSEQUENCES OF NON-COMPLIANCE</span>
+          </td></tr>
+          <tr><td style="padding:14px 16px;">
+            <p style="margin:0 0 7px;font-size:12px;color:#bf360c;line-height:1.6;">&#9679; Escalation to the Head of Department and Disciplinary Committee.</p>
+            <p style="margin:0 0 7px;font-size:12px;color:#bf360c;line-height:1.6;">&#9679; Suspension of vehicle entry permission to the campus.</p>
+            <p style="margin:0;font-size:12px;color:#bf360c;line-height:1.6;">&#9679; Further disciplinary action as per institutional norms.</p>
+          </td></tr>
+        </table>
+      </td></tr>
+
+      <!-- SIGNATURE -->
+      <tr><td style="padding:0 28px 22px;">
+        <p style="margin:0 0 14px;font-size:12px;color:#37474f;line-height:1.7;">This notice is issued in the interest of your safety and well-being. We strongly urge you to take this matter seriously and act responsibly.</p>
+        <div style="border-top:1px solid #e3e8f0;padding-top:14px;">
+          <p style="margin:0 0 2px;font-size:13px;color:#1a237e;font-weight:700;">Campus Safety &amp; Compliance Officer</p>
+          <p style="margin:0 0 2px;font-size:11px;color:#546e7a;">Office of Student Affairs | YOUR COLLEGE NAME</p>
+          <p style="margin:0 0 2px;font-size:11px;color:#546e7a;">safety@college.edu | +91-XXXX-XXXXXX</p>
+          <p style="margin:0;font-size:11px;color:#546e7a;">Mon-Fri, 9:00 AM - 5:00 PM</p>
+        </div>
+      </td></tr>
+
+      <!-- FOOTER -->
+      <tr><td style="background:#1a237e;padding:12px 28px;border-radius:0 0 10px 10px;">
+        <p style="margin:0;font-size:10px;color:#90caf9;text-align:center;line-height:1.6;">
+          This is a system-generated official notice. Please do not reply to this email.<br/>
+          For queries, contact the Campus Safety Office as mentioned above.
+        </p>
+      </td></tr>
+
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>"""
+
                 print(f"Sending email to {defaulter['name']} at {defaulter['email_id']}...")
-                
-                events = agent_executor.stream(
-                    {"messages": [("user", violation_query)]},
-                    stream_mode="values",
-                )
-                
-                # Process events
-                for event in events:
-                    if "messages" in event and event["messages"]:
-                        print(f"Email sent to {defaulter['email_id']}")
-                
+
+                # --- Send directly via Gmail API using MIME (avoids JSON parsing issues) ---
+                subject = f"OFFICIAL NOTICE - Helmet Safety Violation | {defaulter['reg_no']} | {defaulter['violation_datetime']}"
+
+                msg = MIMEMultipart("alternative")
+                msg["To"] = defaulter['email_id']
+                msg["Subject"] = subject
+                msg.attach(MIMEText(html_body, "html"))
+
+                raw_message = base64.urlsafe_b64encode(msg.as_bytes()).decode("utf-8")
+                send_result = api_resource.users().messages().send(
+                    userId="me",
+                    body={"raw": raw_message}
+                ).execute()
+
+                print(f"Email sent to {defaulter['email_id']} (id: {send_result.get('id')})")
+
                 # Record in database that email was sent
                 connection = connect_db()
                 if connection:
