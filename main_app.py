@@ -4,6 +4,7 @@ import os
 import signal
 import psutil
 import time
+from datetime import datetime
 
 # ─── Page Config ───────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -364,6 +365,52 @@ h2, h3 {
     font-family: 'Syne', sans-serif !important;
     color: #ccd6f6 !important;
 }
+
+/* ── Process History Items ── */
+.history-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: #0e1018;
+    border: 1px solid #1a2030;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    transition: border-color 0.2s;
+}
+.history-item:hover {
+    border-color: #2a3555;
+}
+.history-time {
+    color: #3a4558;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    min-width: 60px;
+}
+.history-script {
+    color: #8892a4;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    flex: 1;
+}
+.history-status {
+    color: #00c896;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+}
+.history-status.stopped {
+    color: #f43f5e;
+}
+
+/* ── Toggle Switch ── */
+.stToggle > div {
+    gap: 8px !important;
+}
+.stToggle label {
+    font-family: 'DM Sans', sans-serif !important;
+    color: #8892a4 !important;
+    font-size: 0.85rem !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -378,6 +425,10 @@ if 'process_status' not in st.session_state:
     st.session_state.process_status = {}
 if 'show_plates' not in st.session_state:
     st.session_state.show_plates = False
+if 'process_history' not in st.session_state:
+    st.session_state.process_history = []
+if 'auto_refresh' not in st.session_state:
+    st.session_state.auto_refresh = False
 
 # ─── Helpers ───────────────────────────────────────────────────────────────────
 def kill_process_tree(pid):
@@ -435,9 +486,22 @@ def run_script(script_name):
 
         if st.session_state.process_status.get(script_name) == "stopped":
             st.warning(f"{script_name} was stopped.")
+            status = "stopped"
         else:
             output_placeholder.text_area(f"Console — {script_name}", output_text, height=240)
             st.success(f"✓  {script_name} completed successfully.")
+            status = "completed"
+
+        # Add to history
+        st.session_state.process_history.append({
+            'script': script_name,
+            'time': datetime.now().strftime("%H:%M:%S"),
+            'date': datetime.now().strftime("%Y-%m-%d"),
+            'status': status
+        })
+        # Keep only last 20 entries
+        if len(st.session_state.process_history) > 20:
+            st.session_state.process_history = st.session_state.process_history[-20:]
 
         del st.session_state.processes[script_name]
         del st.session_state.process_status[script_name]
@@ -454,8 +518,23 @@ def stop_process(script_name):
         process = st.session_state.processes[script_name]
         kill_process_tree(process.pid)
         st.session_state.process_status[script_name] = "stopped"
+        
+        # Add to history as stopped
+        st.session_state.process_history.append({
+            'script': script_name,
+            'time': datetime.now().strftime("%H:%M:%S"),
+            'date': datetime.now().strftime("%Y-%m-%d"),
+            'status': 'stopped'
+        })
+        if len(st.session_state.process_history) > 20:
+            st.session_state.process_history = st.session_state.process_history[-20:]
+            
         st.success(f"Stopped {script_name}")
         st.rerun()
+
+def kill_all_processes():
+    for script_name in list(st.session_state.processes.keys()):
+        stop_process(script_name)
 
 def count_plates():
     if os.path.exists(IMAGES_DIR):
@@ -529,14 +608,55 @@ with st.sidebar:
 
     st.markdown('<hr class="styled-divider">', unsafe_allow_html=True)
 
-    if st.button("↻  Refresh Status", key="refresh"):
+    # Refresh button
+    col_refresh, col_auto = st.columns([1, 1])
+    with col_refresh:
+        if st.button("↻  Refresh", key="refresh", use_container_width=True):
+            st.rerun()
+    with col_auto:
+        auto_refresh = st.toggle("🔄 Auto", value=st.session_state.auto_refresh, key="auto_refresh_toggle")
+        st.session_state.auto_refresh = auto_refresh
+
+    # Process Manager Section
+    st.markdown('<hr class="styled-divider">', unsafe_allow_html=True)
+    st.markdown('<p class="section-label">Process Manager</p>', unsafe_allow_html=True)
+
+    # Kill all processes button
+    if st.session_state.processes:
+        if st.button("🛑  Kill All Processes", key="kill_all", use_container_width=True):
+            kill_all_processes()
+            st.success("All processes terminated")
+            time.sleep(1)
+            st.rerun()
+    else:
+        st.button("🛑  Kill All Processes", key="kill_all_disabled", disabled=True, use_container_width=True)
+
+    # Clear history button
+    if st.session_state.process_history:
+        if st.button("🗑️  Clear History", key="clear_history", use_container_width=True):
+            st.session_state.process_history = []
+            st.rerun()
+
+    # Auto-refresh logic
+    if st.session_state.auto_refresh:
+        st.markdown("""
+        <div style="font-family:'DM Mono',monospace; font-size:0.65rem; color:#3a4558; text-align:center; margin:10px 0;">
+            Auto-refreshing every 3 seconds...
+        </div>
+        """, unsafe_allow_html=True)
+        time.sleep(3)
         st.rerun()
 
     st.markdown("""
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
     <div style="position:absolute; bottom:1.5rem; left:1rem; right:1rem;">
         <div style="font-family:'DM Mono',monospace; font-size:0.62rem; color:#2a3040; text-align:center; line-height:1.8;">
             HELMET DETECTION SYSTEM<br>
-            © 2024 HelmetGuard — All rights reserved
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -631,13 +751,36 @@ with col4:
 
 st.markdown('<hr class="styled-divider">', unsafe_allow_html=True)
 
+# ─── Process History ───────────────────────────────────────────────────────────
+st.markdown('<p class="section-label">Process History</p>', unsafe_allow_html=True)
+
+if st.session_state.process_history:
+    for hist in reversed(st.session_state.process_history[-5:]):  # Show last 5, newest first
+        status_class = "history-status stopped" if hist['status'] == 'stopped' else "history-status"
+        status_icon = "⏹️" if hist['status'] == 'stopped' else "✓"
+        st.markdown(f"""
+        <div class="history-item">
+            <span class="history-time">{hist['time']}</span>
+            <span class="history-script">{hist['script']}</span>
+            <span class="{status_class}">{status_icon} {hist['status'].upper()}</span>
+        </div>
+        """, unsafe_allow_html=True)
+else:
+    st.markdown("""
+    <div style="text-align:center; padding:20px; background:#0e1018; border:1px solid #1a2030; border-radius:8px;">
+        <span style="font-family:'DM Mono',monospace; font-size:0.75rem; color:#3a4558;">No process history available</span>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.markdown('<hr class="styled-divider">', unsafe_allow_html=True)
+
 # ─── Defaulters Gallery ─────────────────────────────────────────────────────────
 st.markdown('<p class="section-label">Evidence Gallery</p>', unsafe_allow_html=True)
 
 col_left, col_right = st.columns([1, 5])
 
 with col_left:
-    show_btn = st.button("🖼️  Show Plates", key="btn_show_plates")
+    show_btn = st.button("🖼️  Show Plates", key="btn_show_plates", use_container_width=True)
     if show_btn:
         st.session_state.show_plates = not st.session_state.show_plates
 
