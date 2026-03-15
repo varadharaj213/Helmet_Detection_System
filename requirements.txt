@@ -1,0 +1,26 @@
+Pillow # PIL
+opencv-python
+torch
+torchvision
+numpy
+tqdm
+pandas
+matplotlib
+ipykernel
+langchain
+langchain_community
+langchain_openai
+langchain_core
+langgraph
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+streamlit
+fitz
+frontend
+langchain_groq
+pymupdf
+google-api-python-client
+onnx
+onnxsim
+coremltools
