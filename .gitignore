@@ -1,1 +1,7 @@
 venv/
+token.json
+extracted_text.csv
+matched_students.csv
+cred.json
+app/cred.json
+
