@@ -548,7 +548,7 @@ with st.sidebar:
         <div class="sidebar-logo-icon">🛡️</div>
         <div>
             <div class="sidebar-logo-text">HelmetGuard</div>
-            <div class="sidebar-logo-sub">DETECTION SYSTEM v2.0</div>
+            <div class="sidebar-logo-sub">DETECTION SYSTEM</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
