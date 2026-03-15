@@ -79,10 +79,11 @@
                         {% for email in sent_emails %}
                         <tr>
                             <td class="row-num">{{ loop.index }}</td>
-                            <td class="student-name">
+                            <!-- <td class="student-name">
                                 <div class="avatar">{{ email['Name'][0]|upper }}</div>
                                 {{ email['Name'] }}
-                            </td>
+                            </td> -->
+                            <td>{{ email['Name'] }}</td>
                             <td><span class="reg-badge">{{ email['RegisterNum'] }}</span></td>
                             <td>{{ email['Department'] }}</td>
                             <td><span class="vehicle-badge"><i class="fas fa-motorcycle"></i> {{ email['Bikeno'] }}</span></td>
