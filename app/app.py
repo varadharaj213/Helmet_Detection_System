@@ -512,7 +512,7 @@ def send_violation_mails(defaulters_filename=os.path.join(BASE_DIR, 'matched_stu
             </div>
           </td>
           <td style="padding-left:12px;" valign="middle">
-            <div style="color:#ffffff;font-size:18px;font-weight:700;">YOUR COLLEGE NAME</div>
+            <div style="color:#ffffff;font-size:18px;font-weight:700;">VIT</div>
             <div style="color:#90caf9;font-size:11px;margin-top:2px;">Office of Campus Safety &amp; Compliance</div>
           </td>
           <td align="right" valign="middle">
@@ -605,7 +605,7 @@ def send_violation_mails(defaulters_filename=os.path.join(BASE_DIR, 'matched_stu
         <p style="margin:0 0 14px;font-size:12px;color:#37474f;line-height:1.7;">This notice is issued in the interest of your safety and well-being. We strongly urge you to take this matter seriously and act responsibly.</p>
         <div style="border-top:1px solid #e3e8f0;padding-top:14px;">
           <p style="margin:0 0 2px;font-size:13px;color:#1a237e;font-weight:700;">Campus Safety &amp; Compliance Officer</p>
-          <p style="margin:0 0 2px;font-size:11px;color:#546e7a;">Office of Student Affairs | YOUR COLLEGE NAME</p>
+          <p style="margin:0 0 2px;font-size:11px;color:#546e7a;">Office of Student Affairs | VIT</p>
           <p style="margin:0 0 2px;font-size:11px;color:#546e7a;">safety@college.edu | +91-XXXX-XXXXXX</p>
           <p style="margin:0;font-size:11px;color:#546e7a;">Mon-Fri, 9:00 AM - 5:00 PM</p>
         </div>
