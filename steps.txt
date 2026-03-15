@@ -45,7 +45,7 @@ path change where this D:\Helemtworkingproject\Helmet-Detection-System is there
 YOUR API KEY NEED to change in app.py
 
 
-
+#8 unzip the helmet-nonhelmet_cnn.h5 zip file in the same directory
 
 
 !important
