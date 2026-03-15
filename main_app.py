@@ -35,6 +35,9 @@ st.title("Video Processing Dashboard")
 if st.button("Process Video"):
     run_script("main.py")
 
+if st.button("Live Camera to Detect"):
+    run_script("webcam_main.py")
+
 if st.button("Show Defaulters' Number Plates"):
     show_defaulters_images()
 
