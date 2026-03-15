@@ -28,24 +28,35 @@ pip install -r final.txt
 
 
 
-#4 if any error comes
+#4 
+if any error comes
 pip install --upgrade typing_extensions
 pip install --upgrade pydantic pydantic-core
 pip install --upgrade langchain langchain-community
 
 
-#5 normal run
-python app\app.py
-
-
 #6
-
-streamlit run main_app.py
-
-
-#7
 
 path change where this D:\Helemtworkingproject\Helmet-Detection-System is there
 
 
+#7 change api key
+
 YOUR API KEY NEED to change in app.py
+
+
+
+
+
+!important
+After all install Normal Run:
+
+open one terminal:
+
+venv\Scripts\activate
+python app\app.py
+
+open another terminal:
+
+venv\Scripts\activate
+streamlit run main_app.py
