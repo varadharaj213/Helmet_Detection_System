@@ -6,7 +6,7 @@ import psutil
 import time
 
 # Change this path to the actual folder where your scripts and images are located
-SCRIPT_DIR = r"D:\Helemtworkingproject\Helmet-Detection-System"
+SCRIPT_DIR = r"D:\HELMET_DETECTION_PROJECT\Helmet-Detection-System"
 IMAGES_DIR = os.path.join(SCRIPT_DIR, "number_plates")
 
 # Initialize session state for process tracking

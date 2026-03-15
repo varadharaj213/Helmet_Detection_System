@@ -59,6 +59,6 @@ def process_images_in_folder(folder_path, output_csv):
     print("\nExtraction completed. Results saved in", output_csv)
 
 if __name__ == "__main__":
-    folder_path = r"D:\Helemtworkingproject\Helmet-Detection-System\number_plates"
-    output_csv = r"D:\Helemtworkingproject\Helmet-Detection-System\extracted_text.csv"
+    folder_path = r"D:\HELMET_DETECTION_PROJECT\Helmet-Detection-System\number_plates"
+    output_csv = r"D:\HELMET_DETECTION_PROJECT\Helmet-Detection-System\extracted_text.csv"
     process_images_in_folder(folder_path, output_csv)

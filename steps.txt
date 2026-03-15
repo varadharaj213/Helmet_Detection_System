@@ -37,7 +37,7 @@ pip install --upgrade langchain langchain-community
 
 #6
 
-path change where this D:\Helemtworkingproject\Helmet-Detection-System is there
+path change where this D:\HELMET_DETECTION_PROJECT\Helmet-Detection-System is there
 
 
 #7 change api key

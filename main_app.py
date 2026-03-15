@@ -415,7 +415,7 @@ h2, h3 {
 """, unsafe_allow_html=True)
 
 # ─── Config ────────────────────────────────────────────────────────────────────
-SCRIPT_DIR = r"D:\Helemtworkingproject\Helmet-Detection-System"
+SCRIPT_DIR = r"D:\HELMET_DETECTION_PROJECT\Helmet-Detection-System"
 IMAGES_DIR = os.path.join(SCRIPT_DIR, "number_plates")
 
 # ─── Session State ─────────────────────────────────────────────────────────────
