@@ -224,7 +224,7 @@ tbody tr:hover { background: #f9f9ff; }
 
 .date-cell {
     white-space: nowrap; font-size: 0.82rem; color: var(--text-muted);
-    display: flex; align-items: center; gap: 6px;
+     align-items: center; gap: 6px;
 }
 
 .date-cell i { font-size: 10px; color: var(--gold); }

@@ -347,7 +347,7 @@ tbody tr:hover { background: #f9f9ff; }
     white-space: nowrap;
     font-size: 0.82rem;
     color: var(--text-muted);
-    display: flex;
+    /* display: flex; */
     align-items: center;
     gap: 6px;
 }
