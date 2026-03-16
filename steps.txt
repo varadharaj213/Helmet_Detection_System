@@ -60,3 +60,17 @@ open another terminal:
 
 venv\Scripts\activate
 streamlit run main_app.py
+
+
+
+
+if error like this
+(venv) PS D:\HELMET_DETECTION_PROJECT\Helmet-Detection-System> streamlit run main_app.py
+Fatal error in launcher: Unable to create process using '"D:\Helemtworkingproject\Helmet-Detection-System\venv\Scripts\python.exe"  "D:\HELMET_DETECTION_PROJECT\Helmet-Detection-System\venv\Scripts\streamlit.exe" run main_app.py': The system cannot find the file specified.
+
+(venv) PS D:\HELMET_DETECTION_PROJECT\Helmet-Detection-System> python -m streamlit run main_app.py
+
+  You can now view your Streamlit app in your browser.
+
+  Local URL: http://localhost:8501
+  Network URL: http://10.54.10.107:8501
