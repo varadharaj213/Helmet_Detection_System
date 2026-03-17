@@ -3,7 +3,7 @@ import time
 import os
 import sys
 
-source = 'demo_helmet2.mp4'
+source = 'demo_no_helmet2.mp4'
 
 save_video = True  # want to save video? (when video as source)
 show_video = True  # set true when using video file

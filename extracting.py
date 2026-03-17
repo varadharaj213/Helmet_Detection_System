@@ -18,7 +18,7 @@ def extract_text_from_image(image_path):
         # Remove spaces and special characters to format as a single string
         cleaned_text = re.sub(r'[^A-Za-z0-9]', '', extracted_text)
         
-        # MODIFICATION: Remove "AL" prefix if it exists
+        # Remove "AL" prefix if it exists
         if cleaned_text.startswith('AL'):
             cleaned_text = cleaned_text[2:]  # Remove the first 2 characters
         
@@ -41,6 +41,7 @@ def get_image_datetime(image_path):
 def process_images_in_folder(folder_path, output_csv):
     image_extensions = ('.png', '.jpg', '.jpeg')
     extracted_data = []
+    seen_plates = set()  # Set to track unique number plates
 
     print("\nExtracted Data:\n")
     print(f"{'Image Name':<30} {'Number Plate':<20} {'Date/Time'}")
@@ -51,9 +52,15 @@ def process_images_in_folder(folder_path, output_csv):
             image_path = os.path.join(folder_path, filename)
             text = extract_text_from_image(image_path)
             timestamp = get_image_datetime(image_path)
+            
             if text:
-                extracted_data.append([filename, text, timestamp])
-                print(f"{filename:<30} {text:<20} {timestamp}")  # Display in command prompt
+                # Check if this number plate has been seen before
+                if text not in seen_plates:
+                    seen_plates.add(text)  # Add to set of seen plates
+                    extracted_data.append([filename, text, timestamp])
+                    print(f"{filename:<30} {text:<20} {timestamp}")  # Display in command prompt
+                else:
+                    print(f"{filename:<30} {text:<20} {timestamp} (DUPLICATE - Skipped)")
     
     # Save extracted text to CSV
     with open(output_csv, mode='w', newline='', encoding='utf-8') as file:
@@ -62,6 +69,7 @@ def process_images_in_folder(folder_path, output_csv):
         writer.writerows(extracted_data)
 
     print("\nExtraction completed. Results saved in", output_csv)
+    print(f"Total unique number plates found: {len(extracted_data)}")
 
 if __name__ == "__main__":
     folder_path = r"D:\HELMET_DETECTION_PROJECT\Helmet-Detection-System\number_plates"
