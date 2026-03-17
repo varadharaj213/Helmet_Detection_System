@@ -17,6 +17,11 @@ def extract_text_from_image(image_path):
         extracted_text = pytesseract.image_to_string(image, lang='eng', config='--psm 6')
         # Remove spaces and special characters to format as a single string
         cleaned_text = re.sub(r'[^A-Za-z0-9]', '', extracted_text)
+        
+        # MODIFICATION: Remove "AL" prefix if it exists
+        if cleaned_text.startswith('AL'):
+            cleaned_text = cleaned_text[2:]  # Remove the first 2 characters
+        
         return cleaned_text.strip()
     except Exception as e:
         print(f"Error processing {image_path}: {e}")

@@ -1,4 +1,7 @@
 from my_functions import *
+import time
+import os
+import sys
 
 source = 'demo_helmet2.mp4'
 
@@ -6,6 +9,7 @@ save_video = True  # want to save video? (when video as source)
 show_video = True  # set true when using video file
 save_img = False  # set true when using only image file to save the image
 max_images_to_save = 20  # Define the maximum number of images to save per iteration
+max_duration_seconds = 5  # Maximum duration to run in seconds
 
 # saving video as output
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
@@ -17,13 +21,21 @@ images_saved_count = 0  # Counter to keep track of the number of images saved
 frame_count = 0  # Add frame counter for debugging
 
 # Create directories if they don't exist
-import os
 os.makedirs('number_plates', exist_ok=True)
 os.makedirs('riders_pictures', exist_ok=True)
 
-while cap.isOpened():
-    ret, frame = cap.read()
+# Record start time
+start_time = time.time()
+elapsed_time = 0
 
+print(f"Starting processing. Will run for maximum {max_duration_seconds} seconds or save {max_images_to_save} images")
+
+while cap.isOpened() and elapsed_time < max_duration_seconds and images_saved_count < max_images_to_save:
+    ret, frame = cap.read()
+    
+    # Check elapsed time
+    elapsed_time = time.time() - start_time
+    
     if ret:
         frame_count += 1
         frame = cv2.resize(frame, frame_size)  # resizing image
@@ -45,7 +57,7 @@ while cap.isOpened():
 
         # Only print detection info occasionally to avoid console spam
         if frame_count % 30 == 0:
-            print(f"\n--- Frame {frame_count} ---")
+            print(f"\n--- Frame {frame_count} | Time: {elapsed_time:.1f}s | Images saved: {images_saved_count} ---")
             print(f"Found {len(rider_list)} riders, {len(head_list)} heads, {len(number_list)} number plates")
 
         for rider in rider_list:
@@ -71,10 +83,6 @@ while cap.isOpened():
                         print(f'Error in processing head image: {e}')
                         continue
 
-                    # FIX: Handle None value in helmet_present[0]
-                    # You need to determine what None means - probably "no helmet detected"
-                    # Based on your detection, I'll assume None means helmet is absent
-                    
                     # Check if helmet is present (not None and True)
                     is_helmet_present = helmet_present[0] is True
                     
@@ -94,7 +102,7 @@ while cap.isOpened():
                     frame = cv2.putText(frame, conf_text, (x1h, y1h + 40),
                                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
 
-                    # FIX: Consider None as helmet absent (or adjust based on your needs)
+                    # Consider None as helmet absent (or adjust based on your needs)
                     if not is_helmet_present:  # This will be True when helmet_present[0] is None or False
                         helmet_absent = True
                         
@@ -143,13 +151,39 @@ while cap.isOpened():
             display_frame = cv2.resize(frame, (900, 450))
             cv2.imshow('Frame', display_frame)
 
-        if cv2.waitKey(1) & 0xFF == ord('q') or images_saved_count >= max_images_to_save:
-            print(f"Stopping: saved {images_saved_count}/{max_images_to_save} images")
+        # Check for 'q' key press
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord('q'):
+            print("User requested stop")
+            break
+            
+        # Check if we've reached the time limit or image limit
+        if images_saved_count >= max_images_to_save:
+            print(f"Reached maximum images to save: {images_saved_count}")
+            break
+            
+        if elapsed_time >= max_duration_seconds:
+            print(f"Reached maximum duration: {max_duration_seconds} seconds")
             break
 
     else:
+        # No more frames in video
+        print("End of video reached")
         break
 
+# Add a countdown before closing
+print(f"\nProcessing stopped. Closing in 5 seconds...")
+print(f"Final stats: {frame_count} frames processed, {images_saved_count} images saved in {time.time()-start_time:.1f} seconds")
+
+# Countdown
+for i in range(5, 0, -1):
+    print(f"Closing in {i}...")
+    cv2.waitKey(1000)  # Wait 1 second
+
+# Clean up
 cap.release()
+if save_video:
+    out.release()
 cv2.destroyAllWindows()
+
 print(f'Execution completed. Total images saved: {images_saved_count}')
