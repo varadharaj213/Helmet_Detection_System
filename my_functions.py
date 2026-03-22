@@ -3,8 +3,8 @@ import cv2
 import torch
 import torch.backends.cudnn as cudnn
 from models.experimental import attempt_load
-from utils.general import non_max_suppression
-from torchvision import models
+from utils.general import non_max_suppression #remove duplicate detection
+from torchvision import models #torchvision-img transforms &pretrained models
 from torchvision import transforms
 from PIL import Image
 import time
@@ -24,24 +24,24 @@ head_classification_threshold= 3.0 # make this value lower if want to detect non
 # 928, 544
 # 800, 480 # cs=3.9
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model = attempt_load(yolov5_weight_file, map_location=device)
-cudnn.benchmark = True 
-names = model.module.names if hasattr(model, 'module') else model.names
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu') #Uses GPU if available for faster processing
+model = attempt_load(yolov5_weight_file, map_location=device) #Loads trained YOLO model for object detection
+cudnn.benchmark = True #makes Gpu process faster
+names = model.module.names if hasattr(model, 'module') else model.names #where names is used to list of obj names yolo can detect 
 
 
 
 ### Image classification
 # labels = ['helmet', 'no helmet']
 model2 = torch.load(helmet_classifier_weight, map_location=device)  # ... may need full path
-model2.eval()
+model2.eval() #set model to testing mode
 
 
 transform = transforms.Compose([
-			transforms.Resize(144),
+			transforms.Resize(144), #resize the head img so it is used to uniform input
 			# transforms.CenterCrop(142),
 			transforms.ToTensor(),
-			transforms.Normalize([0.5], [0.5])
+			transforms.Normalize([0.5], [0.5]) #normalize pixel values to improve model performance 
 		  ]) 
 
 
@@ -52,13 +52,13 @@ def img_classify(frame):
 		return [None, 0]
 
 	frame = transform(Image.fromarray(frame))
-	frame = frame.unsqueeze(0)
+	frame = frame.unsqueeze(0)#Adds batch dimension (unsqueeze) for PyTorch.
 	prediction = model2(frame)
 	result_idx = torch.argmax(prediction).item()
 	prediction_conf = sorted(prediction[0]) 
 
 	cs = (prediction_conf[-1]-prediction_conf[-2]).item() # confident score
-	# print(cs) 
+	print("CONFIDENCE SCORE: ",cs, prediction_conf[-1]) 
 	# provide a threshold value of classification prediction as cs
 	if cs > head_classification_threshold: #< --- Classification confident score. Need to adjust, this value
 		return [True, cs] if result_idx == 0 else [False, cs]
@@ -70,8 +70,8 @@ def img_classify(frame):
 
 def object_detection(frame):
 	img = torch.from_numpy(frame)
-	img = img.permute(2, 0, 1).float().to(device)
-	img /= 255.0  
+	img = img.permute(2, 0, 1).float().to(device) #Convert image to tensor and correct format
+	img /= 255.0  # Normalize pixel values (0–1)
 	if img.ndimension() == 3:
 		img = img.unsqueeze(0)
 

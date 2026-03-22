@@ -1,21 +1,21 @@
-from my_functions import *
-import time
-import os
-import sys
+from my_functions import * #contains custom functions like detection, classification
+import time #to track execution time
+import os #for file and folder operation
+import sys #for system level operation
 
 source = 'demo_no_helmet2.mp4'
 
 save_video = True  # want to save video? (when video as source)
 show_video = True  # set true when using video file
 save_img = False  # set true when using only image file to save the image
-max_images_to_save = 20  # Define the maximum number of images to save per iteration
+max_images_to_save = 20 # Define the maximum number of images to save per iteration
 max_duration_seconds = 5  # Maximum duration to run in seconds
 
 # saving video as output
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
 out = cv2.VideoWriter('output.avi', fourcc, 20.0, frame_size)
 
-cap = cv2.VideoCapture(source)
+cap = cv2.VideoCapture(source)#live camera
 
 images_saved_count = 0  # Counter to keep track of the number of images saved
 frame_count = 0  # Add frame counter for debugging
